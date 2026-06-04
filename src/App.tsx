@@ -8,6 +8,7 @@ import {
 
 export default function App() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [search, setSearch] = useState("");
 
   function loadBookmarks() {
     setBookmarks(getBookmarks());
@@ -34,6 +35,16 @@ export default function App() {
     loadBookmarks();
   }
 
+  const filteredBookmarks = bookmarks.filter(
+    (bookmark) =>
+      bookmark.title
+        .toLowerCase()
+        .includes(search.toLowerCase()) ||
+      bookmark.url
+        .toLowerCase()
+        .includes(search.toLowerCase())
+  );
+
   return (
     <div
       style={{
@@ -54,6 +65,8 @@ export default function App() {
         id="search"
         name="search"
         placeholder="Search bookmarks..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
         style={{
           width: "100%",
           marginTop: "12px",
@@ -62,10 +75,10 @@ export default function App() {
       />
 
       <div style={{ marginTop: "20px" }}>
-        {bookmarks.length === 0 ? (
-          <p>No bookmarks yet.</p>
+        {filteredBookmarks.length === 0 ? (
+          <p>No bookmarks found.</p>
         ) : (
-          bookmarks.map((bookmark) => (
+          filteredBookmarks.map((bookmark) => (
             <div
               key={bookmark.id}
               style={{
