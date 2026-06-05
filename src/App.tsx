@@ -18,18 +18,29 @@ export default function App() {
     loadBookmarks();
   }, []);
 
-  function handleAddBookmark() {
-    const bookmark: Bookmark = {
-      id: crypto.randomUUID(),
-      title: `Test Bookmark ${bookmarks.length + 1}`,
-      url: "https://example.com",
-      createdAt: Date.now(),
-    };
+ async function handleAddBookmark() {
+  const tabs = await chrome.tabs.query({
+    active: true,
+    currentWindow: true,
+  });
 
-    saveBookmark(bookmark);
-    loadBookmarks();
+  const currentTab = tabs[0];
+
+  if (!currentTab?.url) {
+    return;
   }
 
+  const bookmark: Bookmark = {
+    id: crypto.randomUUID(),
+    title: currentTab.title || "Untitled",
+    url: currentTab.url,
+    favicon: currentTab.favIconUrl,
+    createdAt: Date.now(),
+  };
+
+  saveBookmark(bookmark);
+  loadBookmarks();
+ }
   function handleDelete(id: string) {
     deleteBookmark(id);
     loadBookmarks();
