@@ -3,5 +3,6 @@ export type Bookmark = {
   title: string;
   url: string;
   favicon?: string;
+  content: string;
   createdAt: number;
 };

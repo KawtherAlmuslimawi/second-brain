@@ -1,1 +1,1 @@
-console.log("Second Brain content script loaded");
+console.log("content script");

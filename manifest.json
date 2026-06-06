@@ -7,18 +7,11 @@
   "permissions": [
     "storage",
     "tabs",
-    "activeTab"
-  ],
-
-  "host_permissions": [
-    "<all_urls>"
+    "activeTab",
+    "scripting"
   ],
 
   "action": {
-    "default_title": "Second Brain"
-  },
-
-  "background": {
-    "service_worker": "background.js"
+    "default_popup": "index.html"
   }
 }

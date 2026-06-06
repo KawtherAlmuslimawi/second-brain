@@ -25,17 +25,31 @@ export default function App() {
   });
 
   const currentTab = tabs[0];
+  if (
+  !currentTab?.url ||
+  currentTab.url.startsWith("chrome://")
+) {
+  alert("This page cannot be saved.");
+  return;
+}
+  const [{ result }] = await chrome.scripting.executeScript({
+  target: { tabId: currentTab.id! },
+  func: () => document.body.innerText,
+  });
+
+  const content = result ?? "";
 
   if (!currentTab?.url) {
     return;
   }
 
   const bookmark: Bookmark = {
-    id: crypto.randomUUID(),
-    title: currentTab.title || "Untitled",
-    url: currentTab.url,
-    favicon: currentTab.favIconUrl,
-    createdAt: Date.now(),
+  id: crypto.randomUUID(),
+  title: currentTab.title || "Untitled",
+  url: currentTab.url,
+  favicon: currentTab.favIconUrl,
+  content,
+  createdAt: Date.now(),
   };
 
   saveBookmark(bookmark);
@@ -47,14 +61,17 @@ export default function App() {
   }
 
   const filteredBookmarks = bookmarks.filter(
-    (bookmark) =>
-      bookmark.title
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      bookmark.url
-        .toLowerCase()
-        .includes(search.toLowerCase())
-  );
+  (bookmark) =>
+    bookmark.title
+      .toLowerCase()
+      .includes(search.toLowerCase()) ||
+    bookmark.url
+      .toLowerCase()
+      .includes(search.toLowerCase()) ||
+    bookmark.content
+      .toLowerCase()
+      .includes(search.toLowerCase())
+   );
 
   return (
     <div
@@ -69,7 +86,7 @@ export default function App() {
       <h1>Second Brain</h1>
 
       <button onClick={handleAddBookmark}>
-        Add Test Bookmark
+        Save Page
       </button>
 
       <input
@@ -101,7 +118,25 @@ export default function App() {
             >
               <strong>{bookmark.title}</strong>
 
-              <div>{bookmark.url}</div>
+              <a
+               href={bookmark.url}
+               target="_blank"
+               rel="noreferrer"
+               
+              >
+               {bookmark.url}
+              </a>
+              <div
+              style={{
+              fontSize: "12px",
+              opacity: 0.7,
+              marginTop: "4px"
+            }}
+            >
+            {bookmark.content
+            ? bookmark.content.slice(0, 120)
+            : "No content extracted"}...
+            </div>
 
               <button
                 onClick={() =>

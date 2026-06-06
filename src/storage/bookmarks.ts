@@ -21,6 +21,13 @@ export function saveBookmark(bookmark: Bookmark) {
     STORAGE_KEY,
     JSON.stringify(bookmarks)
   );
+  const exists = bookmarks.some(
+  b => b.url === bookmark.url
+  );
+
+  if (exists) {
+  return;
+  }
 }
 
 export function deleteBookmark(id: string) {
